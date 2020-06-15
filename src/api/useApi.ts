@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 
-type FetchSettings = {
+export type FetchSettings = {
   url: string;
   method: "GET" | "POST" | "PUT" | "DELETE";
   body?: object;
@@ -13,7 +13,7 @@ export function useApi() {
       const result = await fetch(fetchSettings.url, {
         method: fetchSettings.method,
         body: JSON.stringify(fetchSettings.body),
-        headers: [["Content-Type", "application/json"]]
+        headers: [["Content-Type", "application/json"]],
       });
       return await result.json();
     } catch (err) {
