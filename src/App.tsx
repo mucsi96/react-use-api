@@ -1,5 +1,6 @@
 import React, { ChangeEvent, FormEvent, useCallback, useState } from "react";
 import { useSearch } from "./api/useSearch";
+import { MockSettings } from "./MockSettings";
 import "./styles.css";
 
 export default function App() {
@@ -22,16 +23,17 @@ export default function App() {
       className="App"
       onSubmit={(event: FormEvent) => event.preventDefault()}
     >
+      <MockSettings />
       <input
         type="input"
         value={searchString}
         onChange={handleSearchInputChange}
-      ></input>
+      ></input>{" "}
       <button type="submit" onClick={handleSearchClick}>
         Search
       </button>
       {names?.map((name) => (
-        <h2>{name}</h2>
+        <h2 key={name}>{name}</h2>
       ))}
     </form>
   );

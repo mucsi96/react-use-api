@@ -2,3 +2,14 @@
   font-family: sans-serif;
   text-align: center;
 }
+
+button {
+  border: none;
+  padding: 0.3em 1em;
+  border-radius: 2px;
+}
+
+button.active {
+  background-color: darkslategray;
+  color: white;
+}
