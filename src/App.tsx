@@ -4,6 +4,7 @@ import { MockSettings } from "./MockSettings";
 import "./styles.css";
 
 export default function App() {
+  const [loading, setLoading] = useState(false);
   const [searchString, setSearchString] = useState("");
   const [names, setNames] = useState<string[] | undefined>();
   const { searchByName } = useSearch();
@@ -15,7 +16,11 @@ export default function App() {
   );
 
   const handleSearchClick = useCallback(() => {
-    searchByName(searchString).then(setNames);
+    setLoading(true);
+    searchByName(searchString).then((names) => {
+      setNames(names);
+      setLoading(false);
+    });
   }, [searchByName, searchString]);
 
   return (
@@ -32,9 +37,11 @@ export default function App() {
       <button type="submit" onClick={handleSearchClick}>
         Search
       </button>
-      {names?.map((name) => (
-        <h2 key={name}>{name}</h2>
-      ))}
+      {loading ? (
+        <h2>{"Loading..."}</h2>
+      ) : (
+        names?.map((name) => <h2 key={name}>{name}</h2>)
+      )}
     </form>
   );
 }
