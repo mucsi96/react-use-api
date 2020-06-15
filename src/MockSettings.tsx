@@ -11,17 +11,17 @@ export const MockSettings: FC = () => {
         {"Delay:  "}
         <button
           type="button"
-          onClick={() => setDelay("")}
-          className={delay === "" ? "active" : ""}
+          onClick={() => setDelay("1000")}
+          className={delay === "1000" ? "active" : ""}
         >
-          Off
+          1s
         </button>{" "}
         <button
           type="button"
-          onClick={() => setDelay("10000")}
-          className={delay === "10000" ? "active" : ""}
+          onClick={() => setDelay("5000")}
+          className={delay === "5000" ? "active" : ""}
         >
-          10s
+          5s
         </button>
       </p>
       <p>
