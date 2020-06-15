@@ -1,15 +1,11 @@
-import React, { ChangeEvent, useCallback, useEffect, useState } from "react";
-import { JobAutocomplete, useDataAtWork } from "./api/useDataAtWork";
+import React, { ChangeEvent, FormEvent, useCallback, useState } from "react";
+import { useSearch } from "./api/useSearch";
 import "./styles.css";
 
 export default function App() {
   const [searchString, setSearchString] = useState("");
-  const [jobs, setJobs] = useState<JobAutocomplete[] | undefined>();
-  const { getJobsAutocomplete } = useDataAtWork();
-
-  useEffect(() => {
-    getJobsAutocomplete("react").then(setJobs);
-  }, [getJobsAutocomplete]);
+  const [names, setNames] = useState<string[] | undefined>();
+  const { searchByName } = useSearch();
 
   const handleSearchInputChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) =>
@@ -17,17 +13,26 @@ export default function App() {
     []
   );
 
+  const handleSearchClick = useCallback(() => {
+    searchByName(searchString).then(setNames);
+  }, [searchByName, searchString]);
+
   return (
-    <div className="App">
+    <form
+      className="App"
+      onSubmit={(event: FormEvent) => event.preventDefault()}
+    >
       <input
         type="input"
         value={searchString}
         onChange={handleSearchInputChange}
       ></input>
-      <button type="button">Search</button>
-      {jobs?.map((job) => (
-        <h2>{job.suggestion}</h2>
+      <button type="submit" onClick={handleSearchClick}>
+        Search
+      </button>
+      {names?.map((name) => (
+        <h2>{name}</h2>
       ))}
-    </div>
+    </form>
   );
 }
