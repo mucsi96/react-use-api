@@ -14,7 +14,7 @@ module.exports = function (app) {
     );
 
     if (fail) {
-      return res.status(501).send({ error: "Error has occured" });
+      return res.status(501).send({ error: "Error on server" });
     }
 
     setTimeout(() => {

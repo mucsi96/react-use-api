@@ -19,7 +19,10 @@ beforeEach(() => {
 });
 
 const TestComponent: FC<FetchSettings> = (props): ReactElement => {
-  const [data, load, loading, error] = useApi<{ test: string }>(props);
+  const [data, load, loading, error] = useApi<
+    { test: string },
+    { error: string }
+  >(props);
   const loadButton = (
     <button type="button" id="load" onClick={load}>
       Load
@@ -27,7 +30,7 @@ const TestComponent: FC<FetchSettings> = (props): ReactElement => {
   );
 
   if (error) {
-    return <span id="error">{error.message}</span>;
+    return <span id="error">{error.error}</span>;
   }
 
   if (loading) {
