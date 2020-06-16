@@ -5,6 +5,7 @@ import { createMockPromise, MockPromise } from "../test/mockPromise";
 import { FetchSettings, useApi } from "./useApi";
 
 type FetchResponse = {
+  ok: boolean;
   json: () => Promise<object>;
 };
 
@@ -96,6 +97,7 @@ describe("useApi", () => {
     });
     await act(async () => {
       await mockFetchPromise.resolve({
+        ok: true,
         json: () => Promise.resolve({ test: "testResult" }),
       });
     });
@@ -119,12 +121,30 @@ describe("useApi", () => {
     });
     await act(async () => {
       await mockFetchPromise.resolve({
+        ok: true,
         json: () => Promise.resolve(undefined),
       });
     });
     wrapper.update();
     expect(wrapper.find("#loading").exists()).toBe(false);
     expect(wrapper.find("#error").exists()).toBe(false);
+    expect(wrapper.find("#data").exists()).toBe(false);
+  });
+
+  test("returns error state on not ok response", async () => {
+    const wrapper = mount(<TestComponent {...getProps()} />);
+    act(() => {
+      wrapper.find("#load").simulate("click");
+    });
+    await act(async () => {
+      await mockFetchPromise.resolve({
+        ok: false,
+        json: () => Promise.resolve({ error: "testError" }),
+      });
+    });
+    wrapper.update();
+    expect(wrapper.find("#loading").exists()).toBe(false);
+    expect(wrapper.find("#error").text()).toEqual("testError");
     expect(wrapper.find("#data").exists()).toBe(false);
   });
 });
