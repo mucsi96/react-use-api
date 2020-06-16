@@ -61,18 +61,10 @@ const getProps = (): FetchSettings => ({
 });
 
 describe("useApi", () => {
-  test("returns no data initially", () => {
+  test("returns empty state initially", () => {
     const wrapper = mount(<TestComponent {...getProps()} />);
     expect(wrapper.find("#data").exists()).toBe(false);
-  });
-
-  test("returns no loading state initially", () => {
-    const wrapper = mount(<TestComponent {...getProps()} />);
     expect(wrapper.find("#loading").exists()).toBe(false);
-  });
-
-  test("returns no error state initially", () => {
-    const wrapper = mount(<TestComponent {...getProps()} />);
     expect(wrapper.find("#error").exists()).toBe(false);
   });
 
@@ -82,7 +74,9 @@ describe("useApi", () => {
       wrapper.find("#load").simulate("click");
     });
     wrapper.update();
+    expect(wrapper.find("#data").exists()).toBe(false);
     expect(wrapper.find("#loading").exists()).toBe(true);
+    expect(wrapper.find("#error").exists()).toBe(false);
   });
 
   test("fetches data from the server", async () => {
