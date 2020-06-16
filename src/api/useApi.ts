@@ -6,21 +6,33 @@ export type FetchSettings = {
   body?: object;
 };
 
-export function useApi() {
-  const [, setError] = useState();
-  return useCallback(async (fetchSettings: FetchSettings) => {
+export function useApi<R>({
+  url,
+  method,
+  body,
+}: FetchSettings): [
+  R | undefined,
+  () => Promise<void>,
+  boolean,
+  Error | undefined
+] {
+  const [data, setData] = useState();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error>();
+  const load = useCallback(async () => {
     try {
-      const result = await fetch(fetchSettings.url, {
-        method: fetchSettings.method,
-        body: JSON.stringify(fetchSettings.body),
+      setLoading(true);
+      const result = await fetch(url, {
+        method: method,
+        body: JSON.stringify(body),
         headers: [["Content-Type", "application/json"]],
       });
-      return await result.json();
+      setData(await result.json());
     } catch (err) {
-      setError(() => {
-        throw err;
-      });
-      throw err;
+      setError(err);
+    } finally {
+      setLoading(false);
     }
-  }, []);
+  }, [url, method, body]);
+  return [data, load, loading, error];
 }
