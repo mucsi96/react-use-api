@@ -1,9 +1,10 @@
 import React, { FC } from "react";
+import { ApiError } from "./api/ApiError";
 
 export const SearchResults: FC<{
   names?: string[];
   loading: boolean;
-  error?: { error: string };
+  error?: ApiError | Error;
 }> = ({ names, loading, error }) => {
   console.log({ names, loading, error });
 
@@ -15,7 +16,8 @@ export const SearchResults: FC<{
     return (
       <h2>
         {"Error: "}
-        {error.error}
+        {error.message}
+        {error instanceof ApiError && ` (${error.status})`}
       </h2>
     );
   }
@@ -23,9 +25,11 @@ export const SearchResults: FC<{
   if (names) {
     return (
       <>
-        {names.map((name) => (
-          <h2 key={name}>{name}</h2>
-        ))}
+        {names.length ? (
+          names.map((name) => <h2 key={name}>{name}</h2>)
+        ) : (
+          <h2>{"No matching name"}</h2>
+        )}
       </>
     );
   }

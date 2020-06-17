@@ -18,7 +18,9 @@ export function createMockPromise<T>(): MockPromise<T> {
   };
   mockPromise.reject = async (error: Error) => {
     rejectMockPromise(error);
-    await mockPromise;
+    try {
+      await mockPromise;
+    } catch {}
   };
 
   return mockPromise;
