@@ -37,26 +37,18 @@ export function useApi<R>({
       } else {
         const err = new ApiError((await response.json()).error);
         err.setStatus(response.status);
-
-        if (noErrorPropagationBoundary) {
-          setError(err);
-        } else {
-          setError(() => {
-            throw err;
-          });
-        }
+        setError(err);
       }
     } catch (err) {
-      if (noErrorPropagationBoundary) {
-        setError(err);
-      } else {
-        setError(() => {
-          throw err;
-        });
-      }
+      setError(err);
     } finally {
       setLoading(false);
     }
-  }, [url, method, body, noErrorPropagationBoundary]);
+  }, [url, method, body]);
+
+  if (error && !noErrorPropagationBoundary) {
+    throw error;
+  }
+
   return [data, load, loading, error];
 }

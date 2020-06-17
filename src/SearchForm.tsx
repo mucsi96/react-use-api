@@ -9,8 +9,12 @@ import { useSearchByName } from "./api/useSearchByName";
 import { SearchResults } from "./SearchResults";
 
 export const SearchForm: FC = () => {
+  const [errorBoundary, toggleErrorBoundary] = useState(false);
   const [searchString, setSearchString] = useState("");
-  const [names, search, loading, error] = useSearchByName(searchString);
+  const [names, search, loading, error] = useSearchByName({
+    name: searchString,
+    noErrorPropagationBoundary: !errorBoundary,
+  });
 
   const handleSearchInputChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) =>
@@ -21,6 +25,23 @@ export const SearchForm: FC = () => {
   return (
     <>
       <form onSubmit={(event: FormEvent) => event.preventDefault()}>
+        <p>
+          {"ErrorBoundary:  "}
+          <button
+            type="button"
+            onClick={() => toggleErrorBoundary(false)}
+            className={!errorBoundary ? "active" : ""}
+          >
+            Off
+          </button>{" "}
+          <button
+            type="button"
+            onClick={() => toggleErrorBoundary(true)}
+            className={errorBoundary ? "active" : ""}
+          >
+            On
+          </button>
+        </p>
         <input
           type="input"
           value={searchString}

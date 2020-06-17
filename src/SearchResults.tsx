@@ -6,8 +6,6 @@ export const SearchResults: FC<{
   loading: boolean;
   error?: ApiError | Error;
 }> = ({ names, loading, error }) => {
-  console.log({ names, loading, error });
-
   if (loading) {
     return <h2>{"Loading..."}</h2>;
   }

@@ -1,6 +1,7 @@
 import { mount } from "enzyme";
 import React, { FC, ReactElement } from "react";
 import { act } from "react-dom/test-utils";
+import { ErrorBoundary } from "../ErrorBoundary";
 import { createMockPromise, MockPromise } from "../test/mockPromise";
 import { ApiError } from "./ApiError";
 import { FetchSettings, useApi } from "./useApi";
@@ -13,13 +14,14 @@ type FetchResponse = {
 
 let mockFetchPromise: MockPromise<FetchResponse>;
 let mockFetch: jest.Mock<MockPromise<FetchResponse>>;
-const resultCallback = jest.fn();
 
 beforeEach(() => {
   mockFetchPromise = createMockPromise<FetchResponse>();
   mockFetch = jest.fn(() => mockFetchPromise);
   global.fetch = mockFetch;
 });
+
+window.addEventListener("error", (event) => event.preventDefault());
 
 const TestComponent: FC<FetchSettings> = (props): ReactElement => {
   const [data, load, loading, error] = useApi<{ test: string }>(props);
@@ -129,7 +131,9 @@ describe("useApi", () => {
   describe("with no error propagation to boundary", () => {
     test("returns error state on not ok response", async () => {
       const wrapper = mount(
-        <TestComponent {...getProps()} noErrorPropagationBoundary />
+        <ErrorBoundary>
+          <TestComponent {...getProps()} noErrorPropagationBoundary />
+        </ErrorBoundary>
       );
       act(() => {
         wrapper.find("#load").simulate("click");
@@ -149,7 +153,9 @@ describe("useApi", () => {
 
     test("returns error state on network failure", async () => {
       const wrapper = mount(
-        <TestComponent {...getProps()} noErrorPropagationBoundary />
+        <ErrorBoundary>
+          <TestComponent {...getProps()} noErrorPropagationBoundary />
+        </ErrorBoundary>
       );
       act(() => {
         wrapper.find("#load").simulate("click");
@@ -161,6 +167,53 @@ describe("useApi", () => {
       wrapper.update();
       expect(wrapper.find("#loading").exists()).toBe(false);
       expect(wrapper.find("#error").text()).toEqual("networkError");
+      expect(wrapper.find("#data").exists()).toBe(false);
+    });
+  });
+
+  describe("with error propagation to boundary", () => {
+    test("returns error state on not ok response", async () => {
+      const wrapper = mount(
+        <ErrorBoundary>
+          <TestComponent {...getProps()} />
+        </ErrorBoundary>
+      );
+      act(() => {
+        wrapper.find("#load").simulate("click");
+      });
+      await act(async () => {
+        await mockFetchPromise.resolve({
+          ok: false,
+          status: 500,
+          json: () => Promise.resolve({ error: "serverError" }),
+        });
+      });
+      wrapper.update();
+      expect(wrapper.find("#loading").exists()).toBe(false);
+      expect(wrapper.find("#error").text()).toEqual(
+        "Caught by error boundary: serverError (500)"
+      );
+      expect(wrapper.find("#data").exists()).toBe(false);
+    });
+
+    test("returns error state on network failure", async () => {
+      const wrapper = mount(
+        <ErrorBoundary>
+          <TestComponent {...getProps()} />
+        </ErrorBoundary>
+      );
+      act(() => {
+        wrapper.find("#load").simulate("click");
+      });
+      await act(async () => {
+        await mockFetchPromise.reject(new Error("networkError"));
+      });
+
+      wrapper.update();
+      expect(wrapper.find("#loading").exists()).toBe(false);
+      expect(wrapper.find("#error").text()).toEqual(
+        "Caught by error boundary: networkError"
+      );
       expect(wrapper.find("#data").exists()).toBe(false);
     });
   });
