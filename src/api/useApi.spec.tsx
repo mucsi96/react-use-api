@@ -87,11 +87,14 @@ describe("useApi", () => {
     act(() => {
       wrapper.find("#load").simulate("click");
     });
-    expect(mockFetch).toBeCalledWith("http://test.url", {
-      body: undefined,
-      headers: [["Content-Type", "application/json"]],
-      method: "GET",
-    });
+    expect(mockFetch).toBeCalledWith(
+      "http://test.url",
+      expect.objectContaining({
+        body: undefined,
+        headers: [["Content-Type", "application/json"]],
+        method: "GET",
+      })
+    );
     await act(async () => {
       await mockFetchPromise.resolve({
         ok: true,
@@ -111,11 +114,14 @@ describe("useApi", () => {
     act(() => {
       wrapper.find("#load").simulate("click");
     });
-    expect(mockFetch).toBeCalledWith("http://test.url", {
-      body: JSON.stringify({ test: "body" }),
-      headers: [["Content-Type", "application/json"]],
-      method: "POST",
-    });
+    expect(mockFetch).toBeCalledWith(
+      "http://test.url",
+      expect.objectContaining({
+        body: JSON.stringify({ test: "body" }),
+        headers: [["Content-Type", "application/json"]],
+        method: "POST",
+      })
+    );
     await act(async () => {
       await mockFetchPromise.resolve({
         ok: true,
@@ -216,5 +222,46 @@ describe("useApi", () => {
       );
       expect(wrapper.find("#data").exists()).toBe(false);
     });
+  });
+
+  test("cancells request on unmount", async () => {
+    const wrapper = mount(<TestComponent {...getProps()} />);
+    act(() => {
+      wrapper.find("#load").simulate("click");
+    });
+    const signal = mockFetch.mock.calls[0][1].signal as AbortSignal;
+    expect(signal.aborted).toBe(false);
+    wrapper.unmount();
+    expect(signal.aborted).toBe(true);
+  });
+
+  test("cancells request on next load", async () => {
+    const wrapper = mount(<TestComponent {...getProps()} />);
+    act(() => {
+      wrapper.find("#load").simulate("click");
+    });
+    const signal = mockFetch.mock.calls[0][1].signal as AbortSignal;
+    expect(signal.aborted).toBe(false);
+    act(() => {
+      wrapper.find("#load").simulate("click");
+    });
+    expect(signal.aborted).toBe(true);
+  });
+
+  test("sets no error state on request abort", async () => {
+    const wrapper = mount(<TestComponent {...getProps()} />);
+    act(() => {
+      wrapper.find("#load").simulate("click");
+    });
+    await act(async () => {
+      const abortError = new Error();
+      abortError.name = "AbortError";
+      await mockFetchPromise.reject(abortError);
+    });
+
+    wrapper.update();
+    expect(wrapper.find("#loading").exists()).toBe(true);
+    expect(wrapper.find("#error").exists()).toBe(false);
+    expect(wrapper.find("#data").exists()).toBe(false);
   });
 });

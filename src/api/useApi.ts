@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ApiError } from "./ApiError";
 
 export type FetchSettings = {
@@ -22,8 +22,16 @@ export function useApi<R>({
   const [data, setData] = useState();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error>();
+  const abortController = useRef<AbortController>();
+
   const load = useCallback(async () => {
     try {
+      if (abortController.current) {
+        abortController.current.abort();
+      }
+
+      abortController.current = new AbortController();
+
       setLoading(true);
       setData(undefined);
       setError(undefined);
@@ -31,7 +39,9 @@ export function useApi<R>({
         method: method,
         body: JSON.stringify(body),
         headers: [["Content-Type", "application/json"]],
+        signal: abortController.current.signal,
       });
+      setLoading(false);
       if (response.ok) {
         setData(await response.json());
       } else {
@@ -40,11 +50,20 @@ export function useApi<R>({
         setError(err);
       }
     } catch (err) {
-      setError(err);
-    } finally {
-      setLoading(false);
+      if (err.name !== "AbortError") {
+        setLoading(false);
+        setError(err);
+      }
     }
   }, [url, method, body]);
+
+  useEffect(() => {
+    return () => {
+      if (abortController.current) {
+        abortController.current.abort();
+      }
+    };
+  }, [abortController]);
 
   if (error && !noErrorPropagationBoundary) {
     throw error;

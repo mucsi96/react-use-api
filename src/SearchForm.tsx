@@ -33,7 +33,7 @@ export const SearchForm: FC = () => {
             className={!errorBoundary ? "active" : ""}
           >
             Off
-          </button>{" "}
+          </button>
           <button
             type="button"
             onClick={() => toggleErrorBoundary(true)}
@@ -46,7 +46,7 @@ export const SearchForm: FC = () => {
           type="input"
           value={searchString}
           onChange={handleSearchInputChange}
-        ></input>{" "}
+        ></input>
         <button type="submit" onClick={search}>
           Search
         </button>

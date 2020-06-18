@@ -1,6 +1,15 @@
 import React, { FC } from "react";
 import { useCookie } from "./api/useCookie";
 
+const delays = [
+  { name: "Off", ms: "0" },
+  { name: "1s", ms: "1000" },
+  { name: "2s", ms: "2000" },
+  { name: "3s", ms: "3000" },
+  { name: "4s", ms: "4000" },
+  { name: "5s", ms: "5000" },
+];
+
 export const MockSettings: FC = () => {
   const [delay, setDelay] = useCookie("X-Delay", "");
   const [fail, setFail] = useCookie("X-Fail", "");
@@ -9,20 +18,16 @@ export const MockSettings: FC = () => {
     <>
       <p>
         {"Delay:  "}
-        <button
-          type="button"
-          onClick={() => setDelay("1000")}
-          className={delay === "1000" ? "active" : ""}
-        >
-          1s
-        </button>{" "}
-        <button
-          type="button"
-          onClick={() => setDelay("5000")}
-          className={delay === "5000" ? "active" : ""}
-        >
-          5s
-        </button>
+        {delays.map(({ name, ms }) => (
+          <button
+            key={ms}
+            type="button"
+            onClick={() => setDelay(ms)}
+            className={delay === ms ? "active" : ""}
+          >
+            {name}
+          </button>
+        ))}
       </p>
       <p>
         {"Fail:  "}
@@ -31,8 +36,8 @@ export const MockSettings: FC = () => {
           onClick={() => setFail("")}
           className={fail === "" ? "active" : ""}
         >
-          No
-        </button>{" "}
+          Off
+        </button>
         <button
           type="button"
           onClick={() => setFail("true")}

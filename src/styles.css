@@ -13,3 +13,8 @@ button.active {
   background-color: darkslategray;
   color: white;
 }
+
+button + button,
+input + button {
+  margin-left: 0.3em;
+}
