@@ -6,31 +6,21 @@ React hook for fetching data.
 ```typescript
 import { useApi } from "./useApi";
 
-function useSearchByName({
-  name
-}: {
-  name: string;
-}) {
+function useSearchByName(name: string) {
   return useApi<string[]>({
     method: "GET",
     url: `/api/search/${name}`
   });
 }
 
-const [names, search, loading] = useSearchByName({
-  name: searchString
-});
+const [names, search, loading] = useSearchByName(searchString);
 ```
 
 ## Usage without ErrorBoundary
 ```typescript
 import { useApi } from "./useApi";
 
-function useSearchByName({
-  name
-}: {
-  name: string;
-}) {
+function useSearchByName(name: string) {
   return useApi<string[]>({
     method: "GET",
     url: `/api/search/${name}`,
@@ -38,9 +28,7 @@ function useSearchByName({
   });
 }
 
-const [names, search, loading, error] = useSearchByName({
-  name: searchString
-});
+const [names, search, loading, error] = useSearchByName(searchString);
 ```
 
 ## Features
