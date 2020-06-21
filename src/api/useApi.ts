@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useApiContext } from "./ApiContext";
 import { ApiError } from "./ApiError";
 
 export type FetchSettings = {
@@ -23,6 +24,7 @@ export function useApi<R>({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error>();
   const abortController = useRef<AbortController>();
+  const { beforeFetch, afterFetch } = useApiContext();
 
   const load = useCallback(async () => {
     try {
@@ -35,13 +37,22 @@ export function useApi<R>({
       setLoading(true);
       setData(undefined);
       setError(undefined);
-      const response = await fetch(url, {
+      let request = new Request(url, {
         method: method,
         body: JSON.stringify(body),
-        headers: [["Content-Type", "application/json"]],
+        headers: {
+          "Content-Type": "application/json",
+        },
         signal: abortController.current.signal,
       });
+      if (beforeFetch) {
+        request = await beforeFetch(request);
+      }
+      const response = await fetch(request);
       setLoading(false);
+      if (afterFetch) {
+        await afterFetch(response, null);
+      }
       if (response.ok) {
         setData(await response.json());
       } else {
@@ -50,12 +61,15 @@ export function useApi<R>({
         setError(err);
       }
     } catch (err) {
+      if (afterFetch) {
+        await afterFetch(null, err);
+      }
       if (err.name !== "AbortError") {
         setLoading(false);
         setError(err);
       }
     }
-  }, [url, method, body]);
+  }, [url, method, body, beforeFetch, afterFetch]);
 
   useEffect(() => {
     return () => {
