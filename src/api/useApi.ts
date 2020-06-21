@@ -50,15 +50,15 @@ export function useApi<R>({
       }
       const response = await fetch(request);
       setLoading(false);
-      if (typeof postFetch === "function") {
-        await postFetch(response, null);
-      }
       if (response.ok) {
         setData(await response.json());
       } else {
         const err = new ApiError((await response.json()).error);
         err.setStatus(response.status);
         setError(err);
+      }
+      if (typeof postFetch === "function") {
+        await postFetch(response, null);
       }
     } catch (err) {
       if (typeof postFetch === "function") {
