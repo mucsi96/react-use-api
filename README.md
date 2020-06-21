@@ -49,7 +49,7 @@ const [names, search, loading, error] = useSearchByName(searchString);
 
 ## Error handling for network errors
 
-![Animated GIF-downsized (2)](https://user-images.githubusercontent.com/3163392/85226982-9eff5f00-b3da-11ea-8407-268656aacad4.gif)
+![Animated GIF-downsized (6)](https://user-images.githubusercontent.com/3163392/85227148-d0c4f580-b3db-11ea-827c-7ab23b8672a9.gif)
 
 ## Support for error boundaries
 
@@ -61,4 +61,4 @@ const [names, search, loading, error] = useSearchByName(searchString);
 
 ## Request cancelling on prop change
 
-![Animated GIF-downsized (5)](https://user-images.githubusercontent.com/3163392/85226988-a58dd680-b3da-11ea-9211-88a53f040084.gif)
+![Animated GIF-downsized (7)](https://user-images.githubusercontent.com/3163392/85227149-d28eb900-b3db-11ea-8e50-28b6fac65ff7.gif)
