@@ -57,8 +57,8 @@ export default function App() {
   return (
     <ApiContextProvider {...apiContext}>
       <ErrorBoundary>
-            <SearchForm />
-          </ErrorBoundary>
+        <SearchForm />
+      </ErrorBoundary>
     </ApiContextProvider>
   );
 }
