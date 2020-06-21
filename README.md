@@ -6,7 +6,7 @@ React hook for fetching data.
 ```typescript
 import { useApi } from "./useApi";
 
-export function useSearchByName({
+function useSearchByName({
   name
 }: {
   name: string;
