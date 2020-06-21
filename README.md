@@ -38,6 +38,8 @@ const [names, search, loading, error] = useSearchByName(searchString);
 - Support for error boundaries
 - Request cancelling on component unmount
 - Request cancelling on prop change
+- Request enhacing on application / context level. For example adding some headers
+- Response processing on application / context level. For example logging errors.
 
 ## Fetching data using fetchAPI
 
@@ -62,3 +64,11 @@ const [names, search, loading, error] = useSearchByName(searchString);
 ## Request cancelling on prop change
 
 ![Animated GIF-downsized (7)](https://user-images.githubusercontent.com/3163392/85227149-d28eb900-b3db-11ea-8e50-28b6fac65ff7.gif)
+
+## Request enhacing on application / context level
+
+![Animated GIF-downsized (7)](https://user-images.githubusercontent.com/3163392/85233353-d33c4500-b405-11ea-9af0-3ebdc1e44fa1.gif)
+
+## Response processing on application / context level
+
+![Animated GIF-downsized (8)](https://user-images.githubusercontent.com/3163392/85233355-d6cfcc00-b405-11ea-97e1-da4af116512a.gif)
