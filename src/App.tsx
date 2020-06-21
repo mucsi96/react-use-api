@@ -17,7 +17,10 @@ export default function App() {
         return Promise.resolve(request);
       },
       postFetch(response, error) {
-        console.log("postFetch", { response, error });
+        console.log("this log was made on application level", {
+          response,
+          error,
+        });
         return Promise.resolve();
       },
     }),
