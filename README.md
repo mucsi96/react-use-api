@@ -67,8 +67,8 @@ const [names, search, loading, error] = useSearchByName(searchString);
 
 ## Request enhacing on application / context level
 
-![Animated GIF-downsized (7)](https://user-images.githubusercontent.com/3163392/85233353-d33c4500-b405-11ea-9af0-3ebdc1e44fa1.gif)
+![Animated GIF-downsized (8)](https://user-images.githubusercontent.com/3163392/85233355-d6cfcc00-b405-11ea-97e1-da4af116512a.gif)
 
 ## Response processing on application / context level
 
-![Animated GIF-downsized (8)](https://user-images.githubusercontent.com/3163392/85233355-d6cfcc00-b405-11ea-97e1-da4af116512a.gif)
+![Animated GIF-downsized (9)](https://user-images.githubusercontent.com/3163392/85233410-329a5500-b406-11ea-9dde-82ddb568c3f1.gif)
