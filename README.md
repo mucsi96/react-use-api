@@ -31,6 +31,39 @@ function useSearchByName(name: string) {
 const [names, search, loading, error] = useSearchByName(searchString);
 ```
 
+## Usage of ApiContextProvider
+
+```typescript
+export default function App() {
+  const apiContext = useMemo<ApiContext>(
+    () => ({
+      enhanceRequest(request) {
+        request.headers.append(
+          "x-this-header",
+          "was-added-on-application-level"
+        );
+        return Promise.resolve(request);
+      },
+      postFetch(response, error) {
+        console.log("this log was made on application level", {
+          response,
+          error,
+        });
+        return Promise.resolve();
+      },
+    }),
+    []
+  );
+  return (
+    <ApiContextProvider {...apiContext}>
+      <ErrorBoundary>
+            <SearchForm />
+          </ErrorBoundary>
+    </ApiContextProvider>
+  );
+}
+```
+
 ## Features
 - Fetching data using fetchAPI
 - Returning data, load function, loading state, error state
