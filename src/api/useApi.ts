@@ -20,11 +20,11 @@ export function useApi<R>({
   boolean,
   ApiError | Error | undefined
 ] {
-  const [data, setData] = useState();
+  const [data, setData] = useState<R>();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error>();
   const abortController = useRef<AbortController>();
-  const { beforeFetch, afterFetch } = useApiContext();
+  const { enhanceRequest, postFetch } = useApiContext();
 
   const load = useCallback(async () => {
     try {
@@ -45,13 +45,13 @@ export function useApi<R>({
         },
         signal: abortController.current.signal,
       });
-      if (beforeFetch) {
-        request = await beforeFetch(request);
+      if (typeof enhanceRequest === "function") {
+        request = await enhanceRequest(request);
       }
       const response = await fetch(request);
       setLoading(false);
-      if (afterFetch) {
-        await afterFetch(response, null);
+      if (typeof postFetch === "function") {
+        await postFetch(response, null);
       }
       if (response.ok) {
         setData(await response.json());
@@ -61,15 +61,15 @@ export function useApi<R>({
         setError(err);
       }
     } catch (err) {
-      if (afterFetch) {
-        await afterFetch(null, err);
+      if (typeof postFetch === "function") {
+        await postFetch(null, err);
       }
       if (err.name !== "AbortError") {
         setLoading(false);
         setError(err);
       }
     }
-  }, [url, method, body, beforeFetch, afterFetch]);
+  }, [url, method, body, enhanceRequest, postFetch]);
 
   useEffect(() => {
     return () => {

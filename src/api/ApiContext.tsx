@@ -3,18 +3,18 @@ import React, { createContext, FC, useContext, useMemo } from "react";
 const Context = createContext({});
 
 export type ApiContext = {
-  beforeFetch?: (request: Request) => Promise<Request>;
-  afterFetch?: (response: Response | null, err: Error | null) => Promise<void>;
+  enhanceRequest?: (request: Request) => Promise<Request>;
+  postFetch?: (response: Response | null, err: Error | null) => Promise<void>;
 };
 export const ApiContextProvider: FC<ApiContext> = ({
-  beforeFetch,
-  afterFetch,
+  enhanceRequest,
+  postFetch,
   children,
 }) => (
   <Context.Provider
-    value={useMemo(() => ({ beforeFetch, afterFetch }), [
-      beforeFetch,
-      afterFetch,
+    value={useMemo(() => ({ enhanceRequest, postFetch }), [
+      enhanceRequest,
+      postFetch,
     ])}
   >
     {children}

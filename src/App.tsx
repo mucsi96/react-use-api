@@ -9,12 +9,15 @@ export default function App() {
   const [renderForm, setRenderForm] = useState(true);
   const apiContext = useMemo<ApiContext>(
     () => ({
-      beforeFetch(request) {
-        console.log("beforeFetch", { request });
+      enhanceRequest(request) {
+        request.headers.append(
+          "x-this-header",
+          "was-added-on-application-level"
+        );
         return Promise.resolve(request);
       },
-      afterFetch(response, error) {
-        console.log("afterFetch", { response, error });
+      postFetch(response, error) {
+        console.log("postFetch", { response, error });
         return Promise.resolve();
       },
     }),
