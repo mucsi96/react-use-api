@@ -3,7 +3,7 @@
 React hook for fetching data.
 
 ## Usage with ErrorBoundary
-```
+```typescript
 import { useApi } from "./useApi";
 
 export function useSearchByName({
@@ -23,7 +23,7 @@ const [names, search, loading] = useSearchByName({
 ```
 
 ## Usage without ErrorBoundary
-```
+```typescript
 import { useApi } from "./useApi";
 
 function useSearchByName({
