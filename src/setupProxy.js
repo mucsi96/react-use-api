@@ -1,6 +1,10 @@
 const names = require("./names.json");
 
 function parseCookies(cookie) {
+  if (!cookie) {
+    return {};
+  }
+
   return cookie.split(";").reduce((acc, cookie) => {
     const [key, value] = cookie.split("=");
     return { ...acc, [key.trim()]: value.trim() };
