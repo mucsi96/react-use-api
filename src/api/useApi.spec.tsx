@@ -87,14 +87,13 @@ describe("useApi", () => {
     act(() => {
       wrapper.find("#load").simulate("click");
     });
-    expect(mockFetch).toBeCalledWith(
-      "http://test.url",
-      expect.objectContaining({
-        body: undefined,
-        headers: [["Content-Type", "application/json"]],
-        method: "GET",
-      })
-    );
+    const request = mockFetch.mock.calls[0][0] as Request;
+    expect(request.url).toEqual("http://test.url");
+    expect(request.method).toEqual("GET");
+    expect(Array.from(request.headers.entries())).toEqual([
+      ["content-type", "application/json"],
+    ]);
+    expect(await request.text()).toEqual("");
     await act(async () => {
       await mockFetchPromise.resolve({
         ok: true,
@@ -114,14 +113,13 @@ describe("useApi", () => {
     act(() => {
       wrapper.find("#load").simulate("click");
     });
-    expect(mockFetch).toBeCalledWith(
-      "http://test.url",
-      expect.objectContaining({
-        body: JSON.stringify({ test: "body" }),
-        headers: [["Content-Type", "application/json"]],
-        method: "POST",
-      })
-    );
+    const request = mockFetch.mock.calls[0][0] as Request;
+    expect(request.url).toEqual("http://test.url");
+    expect(request.method).toEqual("POST");
+    expect(Array.from(request.headers.entries())).toEqual([
+      ["content-type", "application/json"],
+    ]);
+    expect(await request.json()).toEqual({ test: "body" });
     await act(async () => {
       await mockFetchPromise.resolve({
         ok: true,
@@ -229,10 +227,10 @@ describe("useApi", () => {
     act(() => {
       wrapper.find("#load").simulate("click");
     });
-    const signal = mockFetch.mock.calls[0][1].signal as AbortSignal;
-    expect(signal.aborted).toBe(false);
+    const request = mockFetch.mock.calls[0][0] as Request;
+    expect(request.signal.aborted).toBe(false);
     wrapper.unmount();
-    expect(signal.aborted).toBe(true);
+    expect(request.signal.aborted).toBe(true);
   });
 
   test("cancells request on next load", async () => {
@@ -240,12 +238,12 @@ describe("useApi", () => {
     act(() => {
       wrapper.find("#load").simulate("click");
     });
-    const signal = mockFetch.mock.calls[0][1].signal as AbortSignal;
-    expect(signal.aborted).toBe(false);
+    const request = mockFetch.mock.calls[0][0] as Request;
+    expect(request.signal.aborted).toBe(false);
     act(() => {
       wrapper.find("#load").simulate("click");
     });
-    expect(signal.aborted).toBe(true);
+    expect(request.signal.aborted).toBe(true);
   });
 
   test("sets no error state on request abort", async () => {
