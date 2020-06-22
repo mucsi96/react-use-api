@@ -3,6 +3,7 @@ import React, { FC, ReactElement } from "react";
 import { act } from "react-dom/test-utils";
 import { ErrorBoundary } from "../ErrorBoundary";
 import { createMockPromise, MockPromise } from "../test/mockPromise";
+import { ApiContextProvider } from "./ApiContext";
 import { ApiError } from "./ApiError";
 import { FetchSettings, useApi } from "./useApi";
 
@@ -261,5 +262,91 @@ describe("useApi", () => {
     expect(wrapper.find("#loading").exists()).toBe(true);
     expect(wrapper.find("#error").exists()).toBe(false);
     expect(wrapper.find("#data").exists()).toBe(false);
+  });
+
+  test("enhances request based on api context enhanceRequest function", async () => {
+    const enhanceRequest = (request: Request): Promise<Request> => {
+      request.headers.append("x-added", "header");
+      return Promise.resolve(request);
+    };
+    const wrapper = mount(
+      <ApiContextProvider enhanceRequest={enhanceRequest}>
+        <TestComponent {...getProps()} />
+      </ApiContextProvider>
+    );
+    act(() => {
+      wrapper.find("#load").simulate("click");
+    });
+    await act(async () => {
+      await mockFetchPromise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ test: "testResult" }),
+      });
+    });
+    wrapper.update();
+    const request = mockFetch.mock.calls[0][0] as Request;
+    expect(Array.from(request.headers.entries())).toEqual([
+      ["content-type", "application/json"],
+      ["x-added", "header"],
+    ]);
+  });
+
+  test("calls api context postFetch function in case of succeful request", async () => {
+    const postFetch = jest.fn();
+    const wrapper = mount(
+      <ApiContextProvider postFetch={postFetch}>
+        <TestComponent {...getProps()} />
+      </ApiContextProvider>
+    );
+    act(() => {
+      wrapper.find("#load").simulate("click");
+    });
+    await act(async () => {
+      await mockFetchPromise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ test: "testResult" }),
+      });
+    });
+    wrapper.update();
+    const response = postFetch.mock.calls[0][0] as Response;
+    expect(await response.json()).toEqual({ test: "testResult" });
+  });
+
+  test("calls api context postFetch function in case of request failure with no error propagation", async () => {
+    const postFetch = jest.fn();
+    const wrapper = mount(
+      <ApiContextProvider postFetch={postFetch}>
+        <TestComponent {...getProps()} noErrorPropagationBoundary />
+      </ApiContextProvider>
+    );
+    act(() => {
+      wrapper.find("#load").simulate("click");
+    });
+    await act(async () => {
+      await mockFetchPromise.reject(new Error("test error"));
+    });
+    wrapper.update();
+    const error = postFetch.mock.calls[0][1] as Error;
+    expect(error.message).toEqual("test error");
+  });
+
+  test("calls api context postFetch function in case of request failure with error propagation", async () => {
+    const postFetch = jest.fn();
+    const wrapper = mount(
+      <ApiContextProvider postFetch={postFetch}>
+        <ErrorBoundary>
+          <TestComponent {...getProps()} />
+        </ErrorBoundary>
+      </ApiContextProvider>
+    );
+    act(() => {
+      wrapper.find("#load").simulate("click");
+    });
+    await act(async () => {
+      await mockFetchPromise.reject(new Error("test error"));
+    });
+    wrapper.update();
+    const error = postFetch.mock.calls[0][1] as Error;
+    expect(error.message).toEqual("test error");
   });
 });
